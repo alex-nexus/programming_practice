@@ -7,32 +7,35 @@ class Sudoku:
 		self.board = NP.fromstring(sudoku_string, dtype=int, sep=' ').reshape(9,9)
 		#self.get_cells_to_candidates()
 		
-	def unfilled_cells(self):
+	def get_unfilled_cells(self):
 		return [index for index, v in NP.ndenumerate(self.board) if v == 0]
 
+	def get_square(self, i, j):
+		i/=3
+		j/=3
+		return self.board[3*i:3*(i+1), 3*j:3*(j+1)]
+	
+	def get_row(self, i, j):
+		return self.board[i,:]
+
+	def get_col(self, i, j):
+		return self.board[:, j]
+
 	def is_solved(self):
-		return self.is_valid() and len(self.unfilled_cells())==0
+		return self.is_valid() and len(self.get_unfilled_cells())==0
 		
 	#basically find out if there are any repeats for each row, column, and square, discount zeros/unfilled 	
 	def is_valid(self):
-		#validate all rows that none has repeats
+		#validate all rows, columns that none has repeats
 		for i in range(9):
-			if self.has_any_repeat(list(self.board[i,:])):
-				print 'invalid row', i
+			if self.has_any_repeat(list(self.board[i,:])) or self.has_any_repeat(list(self.board[:, i])):
 				return False			
-		#validate all columns that none has repeats
-		for i in range(9):
-			if self.has_any_repeat(list(self.board[:, i])):
-				print 'invalid col', i
-				return False		
 		#check all squares
 		for i in range(3):
 			for j in range(3):
 				if self.has_any_repeat(list(self.board[3*i:3*(i+1), 3*j:3*(j+1)].ravel())):
-					print 'in valid square', i, j
 					return False							
 		return True
-
 	# def find_one_candidate(self):
 	# 	x, candidates = self.cell_to_candidates[0] 
 	# 	i, j = x.split('-')
@@ -43,9 +46,7 @@ class Sudoku:
 	# 	return i, j, v
 
 	def get_cells_to_candidates(self):		
-		cell_to_candidates = defaultdict(set)
-		for i, j in self.unfilled_cells():			
-			cell_to_candidates[str(i)+'-'+str(j)] = sorted(self.compute_candidates(i, j))
+		cell_to_candidates = dict([(str(i)+'-'+str(j), sorted(self.compute_candidates(i, j))) for i, j in self.get_unfilled_cells()])
 		cell_to_candidates = sorted(cell_to_candidates.items(), key=lambda x: len(x[1]))
 		print cell_to_candidates
 		return cell_to_candidates
@@ -54,12 +55,10 @@ class Sudoku:
 		if self.board[i, j] != 0:
 			raise 'filled already'
 		candidates=set(range(1,10))
-		row = list(self.board[i,:])
-		col = list(self.board[:, j])
-		i/=3
-		j/=3
-		square = list(self.board[3*i:3*(i+1), 3*j:3*(j+1)].ravel())
-		return candidates - set(row+col+square)
+		candidates-=set(self.get_row(i ,j)) #row
+		candidates-=set(self.get_col(i, j)) #row		
+		candidates-= set(self.get_square(i, j).ravel())
+		return candidates
 
 	def has_any_repeat(self, nums):
 		nonzero_nums = [n for n in nums if n!=0]
@@ -94,6 +93,7 @@ def solve(s):
 					return solve(s_new)
 				except Exception as e:
 					print 'except', e
+					continue
 				
 sudoku_string = """
 0 0 0 8 5 4 0 0 1
