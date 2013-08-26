@@ -36,6 +36,7 @@ class Sudoku:
 				if self.has_any_repeat(list(self.board[3*i:3*(i+1), 3*j:3*(j+1)].ravel())):
 					return False							
 		return True
+
 	# def find_one_candidate(self):
 	# 	x, candidates = self.cell_to_candidates[0] 
 	# 	i, j = x.split('-')
@@ -48,6 +49,7 @@ class Sudoku:
 	def get_cells_to_candidates(self):		
 		cell_to_candidates = dict([(str(i)+'-'+str(j), sorted(self.compute_candidates(i, j))) for i, j in self.get_unfilled_cells()])
 		cell_to_candidates = sorted(cell_to_candidates.items(), key=lambda x: len(x[1]))
+		#cell_to_candidates = [map(int, x.split('-'))+[v] for x, candidates in cell_to_candidates for v in candidates]
 		print cell_to_candidates
 		return cell_to_candidates
 	
@@ -67,16 +69,14 @@ class Sudoku:
 	def fill(self, i, j, v):
 		print 'fill', i, j, 'with', v
 		self.board[i,j] = v
-		#self.compute_cells_to_candidates() #always re-compute cell to candidates		
-		return self
-
+		
 	def unfill(self, i, j):
 		print 'unfill', i, j
 		self.board[i,j] = 0
-		#self.compute_cells_to_candidates() #always re-compute cell to candidates		
-
+		
 def solve(s):
-	print '---------------'			
+	print '---------------begin--------------'			
+	print s.board
 	if s.is_solved():
 		print 'solution found'
 		return s
@@ -85,15 +85,17 @@ def solve(s):
 	else:
 		for x, candidates in s.get_cells_to_candidates():
 			i, j = x.split('-')
-			print i, j, candidates
 			for v in candidates:
-				s_new = s.fill(i, j, v)
-				print s_new.board
+				print i, j, v
+				s.fill(i, j, v)
 				try:
-					return solve(s_new)
+					return solve(s)
 				except Exception as e:
 					print 'except', e
+					s.unfill(i, j)
 					continue
+
+
 				
 sudoku_string = """
 0 0 0 8 5 4 0 0 1
@@ -106,7 +108,7 @@ sudoku_string = """
 6 4 2 0 0 0 0 0 0
 8 0 0 1 4 7 0 0 0
 """
-sudoku_string = """
+sudoku_string2 = """
 4 1 2 3 6 8 7 9 5
 0 3 0 0 0 0 0 0 0
 0 0 0 7 0 0 0 0 0
