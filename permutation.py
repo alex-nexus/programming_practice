@@ -11,7 +11,7 @@ def permutation(characters):
 		return results
 
 if __name__ == '__main__':
-	input_array = ['A', 'B', 'C', 'T']
+	input_array = ['A', 'B', 'C']
 	output_array = permutation(input_array)
 	print 'input_array', input_array
 	print 'output_array', output_array
