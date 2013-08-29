@@ -24,8 +24,8 @@ def money_change(total, changes):
 				results.append(mc)
 		return results
 
-total = 100
-changes=[50, 20, 10, 5]
+total = 10
+changes=[5, 2, 1]
 print 'input:', changes, 'total:', total
 
 mc_set = money_change(total, changes)
