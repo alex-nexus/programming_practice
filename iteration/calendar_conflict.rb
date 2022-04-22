@@ -1,27 +1,29 @@
+# frozen_string_literal: true
+
 def detect_conflicts(events)
-  i=0
+  i = 0
   loop do
     event = events[i]
-    puts("TRY:"+event.to_s)
-    j=i+1
+    puts('TRY:' + event.to_s)
+    j = i + 1
     next_event = events[j]
 
     while next_event && (event.last > next_event.first)
       if no_overlap?(event, next_event)
-        j+=1
+        j += 1
         next_event = events[j]
       else
         return true
       end
     end
 
-    i+=1
+    i += 1
   end
   false
 end
 
 def no_overlap?(event1, event2)
-  (event1.last <= event2.first) or (event2.last <= event1.first)
+  (event1.last <= event2.first) || (event2.last <= event1.first)
 end
 
 events = [
